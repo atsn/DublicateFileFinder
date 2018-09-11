@@ -1,0 +1,176 @@
+﻿<Window x:Class="DublicateFileFinder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:dublicateFileFinder="clr-namespace:DublicateFileFinder"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="720" Width="1080"
+        Tag="winodwtag">
+    <Window.DataContext>
+        <dublicateFileFinder:MainWindowWiewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <dublicateFileFinder:PathConverter x:Key="PathConverter"/>
+        <dublicateFileFinder:ImgConverter x:Key="ImgConverter"/>
+    </Window.Resources>
+    <Border Padding="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="95*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Text="Dublicates" FontWeight="Bold" BorderBrush="{x:Null}" />
+            <ListView ItemsSource="{Binding Dublicates}" Focusable="False" ScrollViewer.CanContentScroll="False" Grid.Row="1">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Focusable" Value="False" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black" BorderThickness="2">
+
+                            <Grid HorizontalAlignment="Stretch" x:Name="DubListGrid" Margin="0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" x:Name="imgcolumn"/>
+                                    <ColumnDefinition Width="90*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image  RenderOptions.BitmapScalingMode="Fant" Source="{Binding [0], Converter={StaticResource ImgConverter}}" MinHeight="30" MinWidth="30" MaxHeight="50" MaxWidth="50" ScrollViewer.CanContentScroll="False">
+
+                                </Image>
+                                <ListView ItemsSource="{Binding}" Grid.Column="1" ScrollViewer.CanContentScroll="False" Focusable="False">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.Template>
+                                        <ControlTemplate>
+                                            <ItemsPresenter></ItemsPresenter>
+                                        </ControlTemplate>
+                                    </ListView.Template>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid HorizontalAlignment="Stretch">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90*"/>
+                                                    <ColumnDefinition Width="10*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Grid.Column="0" Text="{Binding Converter={StaticResource PathConverter}}">
+                                                    <TextBlock.InputBindings>
+                                                        <MouseBinding Gesture="LeftDoubleClick" CommandParameter="{Binding}" Command="{Binding DataContext.OpenFileCommand ,RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </TextBlock.InputBindings>
+                                                    <TextBlock.ContextMenu>
+                                                        <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                                            <MenuItem Icon="👆" Header="Open File" Command="{Binding Path=DataContext.OpenFileCommand}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"></MenuItem>
+                                                            <MenuItem Icon="📄"  Header="Open File in notepad"  Command="{Binding Path=DataContext.OpenFileInNotepadCommand}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"></MenuItem>
+                                                            <MenuItem Icon="📁"  Header="Open File location"  Command="{Binding Path=DataContext.OpenFileLocationCommand}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"></MenuItem>
+                                                            <MenuItem Icon="📋" Header="Copy file path" Command="{Binding DataContext.CopyFilePathCommand}"  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"></MenuItem>
+                                                            <MenuItem Icon="🗑" Header="DeleteFile" Command="{Binding DataContext.DeleteFileCommeand}"  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"></MenuItem>
+                                                        </ContextMenu>
+                                                    </TextBlock.ContextMenu>
+                                                </TextBlock>
+                                                <Button Tag="DeleteFileButton" Grid.Column="1" Command="{Binding DataContext.DeleteFileCommeand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{x:Null}">
+                                                    <Button.Content>
+                                                        <TextBlock Text="🗑️"></TextBlock>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <fa:ImageAwesome Grid.Column="0" Grid.Row="1" Height="100" Icon="Spinner" SpinDuration="4" Spin="{Binding ShowLoadingIcon}" Visibility="{Binding ShowLoadingIcon, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False" />
+            <TextBox Grid.Column="1" Grid.Row="0"  Text="FileExtentions To Skip" FontWeight="Bold" BorderBrush="{x:Null}" />
+
+            <Grid Grid.Column="1" Margin="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30*"/>
+                    <RowDefinition Height="70*"/>
+                </Grid.RowDefinitions>
+                <ListView x:Name="ListView"  IsSynchronizedWithCurrentItem="False" ItemsSource="{Binding Extentions}" Width="{Binding ListWith, Mode=OneWayToSource}" >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90*"/>
+                                    <ColumnDefinition Width="10*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding}">
+                                </TextBlock>
+                                <Button Grid.Column="1" Command="{Binding DataContext.RemoveExtentionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{x:Null}">
+                                    <Button.Content>
+                                        <TextBlock Text="🗑️"></TextBlock>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Grid Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*"/>
+                        <RowDefinition Height="10*"/>
+                        <RowDefinition Height="20*"/>
+                        <RowDefinition Height="60*"/>
+                    </Grid.RowDefinitions>
+                    <TextBox Text="{Binding Extention, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" AcceptsReturn="True" Foreground="{Binding ExtentionOpacity}" Tag="fsgsg">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="GotFocus">
+                                <i:InvokeCommandAction Command="{Binding ClearOnFocusCommand}"></i:InvokeCommandAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button HorizontalAlignment="Center" MinWidth="110" Content="Add" Margin="0 3" Command="{Binding AddExtentionCommand}"/>
+                        <Button Grid.Column="1" HorizontalAlignment="Center" MinWidth="110" Content="Save ExtentionList" Margin="0 3" Command="{Binding SaveExtentionListCommand}"/>
+                        <Button Grid.Column="2" HorizontalAlignment="Center" MinWidth="110" Content="Load ExtentionList" Margin="0 3" Command="{Binding LoadExtentionListCommand}"/>
+                    </Grid>
+                    <Border Grid.Row="2" Padding="10">
+                        <StackPanel>
+                            <Button Content="GetDublicates"  Grid.Row="2" Command="{Binding GetDublicateCommand}" />
+                            <Button Margin="0 10 0 0" Content="CancelGetdublicates"  Grid.Row="2" Command="{Binding CancelGetDublicates}" />
+                        </StackPanel>
+                    </Border>
+
+
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
+

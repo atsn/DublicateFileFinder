@@ -116,7 +116,7 @@ namespace DublicateFileFinder
 
         #endregion
 
-        private string _extentionPlaceholder = "Extention to skip";
+        private readonly string _extentionPlaceholder = "Extention to skip";
         private readonly double _listitem1Witdht;
         private readonly double _listitem2With;
         private double _listWith;
@@ -150,8 +150,8 @@ namespace DublicateFileFinder
         public async Task FindDublicates(object obj)
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
-            
-            if (dialog.ShowDialog() == DialogResult.Cancel )
+
+            if (dialog.ShowDialog() == DialogResult.Cancel)
             {
                 return;
             }
@@ -200,10 +200,12 @@ namespace DublicateFileFinder
 
         public void SaveExtentionList(object obj)
         {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.OverwritePrompt = true;
-            dialog.Filter = "File extention text| *.fet";
-            dialog.DefaultExt = ".fet";
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                OverwritePrompt = true,
+                Filter = "File extention text| *.fet",
+                DefaultExt = ".fet"
+            };
             dialog.ShowDialog();
             string path = dialog.FileName;
             path = Path.ChangeExtension(path, "fet");
@@ -269,9 +271,11 @@ namespace DublicateFileFinder
                     return;
                 }
             }
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "File extention text| *.fet";
-            dialog.Multiselect = false;
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "File extention text| *.fet",
+                Multiselect = false
+            };
             dialog.ShowDialog();
             if (!File.Exists(dialog.FileName))
             {

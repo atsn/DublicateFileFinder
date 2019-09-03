@@ -234,14 +234,23 @@ namespace DublicateFileFinder
             {
                 return;
             }
-            File.Delete((string)obj);
-            foreach (ObservableCollection<string> dublicate in Dublicates)
+
+            try
             {
-                if (dublicate.Contains(obj.ToString()))
+                File.Delete((string)obj);
+                foreach (ObservableCollection<string> dublicate in Dublicates)
                 {
-                    dublicate.Remove(obj.ToString());
+                    if (dublicate.Contains(obj.ToString()))
+                    {
+                        dublicate.Remove(obj.ToString());
+                    }
                 }
             }
+            catch (IOException)
+            {
+                MessageBox.Show("An Error occurred wile trying to delete the file, The File is probably open in another process");
+            }
+
         }
 
         public void OpenFile(object obj)

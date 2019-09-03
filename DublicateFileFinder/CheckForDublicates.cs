@@ -10,10 +10,10 @@ namespace DublicateFileFinder
 {
     internal class CheckForDublicates
     {
-        private static Dictionary<Tuple<string, long>, string> _files = new Dictionary<Tuple<string, long>, string>();
+        private static Dictionary<Tuple<string, long, string>, string> _files = new Dictionary<Tuple<string, long, string>, string>();
 
-        private static Dictionary<Tuple<string, long>, ObservableCollection<string>> _dublets =
-            new Dictionary<Tuple<string, long>, ObservableCollection<string>>();
+        private static Dictionary<Tuple<string, long, string>, ObservableCollection<string>> _dublets =
+            new Dictionary<Tuple<string, long, string>, ObservableCollection<string>>();
 
         private static List<string> _usedDirect = new List<string>();
         private static List<string> _notSerached = new List<string>();
@@ -27,7 +27,7 @@ namespace DublicateFileFinder
             SynchronizationContext context = SynchronizationContext.Current;
             Action<ObservableCollection<string>> addFunc =
                 st => context.Send(std => showedResults.Add(st), null);
-            Action<Tuple<string, long>, string> addDubFunc =
+            Action<Tuple<string, long, string>, string> addDubFunc =
                 (key, stss) => context.Send(stf => _dublets[key].Add(stss), null);
             try
             {
@@ -43,7 +43,7 @@ namespace DublicateFileFinder
         }
 
         private static void Indexfile(string directory, List<string> skipExtentions,
-            Action<ObservableCollection<string>> addFunc, Action<Tuple<string, long>, string> addDubFunc,
+            Action<ObservableCollection<string>> addFunc, Action<Tuple<string, long, string>, string> addDubFunc,
             CancellationToken token)
         {
             try
@@ -77,21 +77,21 @@ namespace DublicateFileFinder
                     {
                         _notCheked.Add(file);
                     }
-                    if (!_files.ContainsKey(new Tuple<string, long>(key, fileinfo.Length)))
+                    if (!_files.ContainsKey(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower())))
                     {
-                        _files.Add(new Tuple<string, long>(key, fileinfo.Length), file);
+                        _files.Add(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower()), file);
                     }
-                    else if (_dublets.ContainsKey(new Tuple<string, long>(key, fileinfo.Length)))
+                    else if (_dublets.ContainsKey(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower())))
                     {
-                        addDubFunc(new Tuple<string, long>(key, fileinfo.Length), file);
+                        addDubFunc(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower()), file);
                     }
                     else
                     {
-                        _dublets[new Tuple<string, long>(key, fileinfo.Length)] = new ObservableCollection<string>();
-                        addDubFunc(new Tuple<string, long>(key, fileinfo.Length), file);
-                        addDubFunc(new Tuple<string, long>(key, fileinfo.Length),
-                            _files[new Tuple<string, long>(key, fileinfo.Length)]);
-                        addFunc(_dublets[new Tuple<string, long>(key, fileinfo.Length)]);
+                        _dublets[new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower())] = new ObservableCollection<string>();
+                        addDubFunc(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower()), file);
+                        addDubFunc(new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower()),
+                            _files[new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower())]);
+                        addFunc(_dublets[new Tuple<string, long, string>(key, fileinfo.Length, fileinfo.Extension.ToLower())]);
                     }
                 }
 
